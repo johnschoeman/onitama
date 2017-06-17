@@ -1,7 +1,8 @@
-class Player
+class ComputerPlayer
   attr_reader :name, :color
   attr_accessor :pieces, :pieces_lost, :cards
-  def initialize(name, color)
+
+  def initialize(name, color = 'black')
     @name = name
     @color = color
     @pieces = {
@@ -31,12 +32,12 @@ class Player
 
   def get_piece_by_name(name)
     case name
-      when "1","2","3","4"
-        return @pieces[name.to_i]
-      when "s","S"
-        return @pieces[0]
-      else
-        return choice_error(name)
+    when "1", "2", "3", "4"
+      return @pieces[name.to_i]
+    when "s", "S"
+      return @pieces[0]
+    else
+      choice_error(name)
     end
   end
 
@@ -48,14 +49,13 @@ class Player
 
   def available_cards
     res = {}
-    @cards.each {|k, card| res[k] = card.print_card}
+    @cards.each { |k, card| res[k] = card.print_card }
     res
   end
 
   def available_cards_with_moves(piece)
-    pos = piece.position
     res = {}
-    @cards.each {|k, card| res[k] = card.print_card + ": #{piece.available_moves_as_array(card)}"}
+    @cards.each { |k, card| res[k] = card.print_card + ": #{piece.available_moves_as_array(card)}"}
     res
   end
 
@@ -68,7 +68,4 @@ class Player
   def choice_error(choice)
     "#{choice} is not a vaild choice"
   end
-end
-
-class AI < Player
 end
