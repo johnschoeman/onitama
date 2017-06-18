@@ -5,7 +5,7 @@ class ComputerPlayer
   def initialize(name, color = 'black')
     @name = name
     @color = color
-    @pieces = Piece.initial_pieces(self)
+    @pieces = Piece.initial_pieces(color)
     @pieces_lost = []
     @cards = {}
   end
@@ -13,7 +13,7 @@ class ComputerPlayer
   def remove_piece(piece)
     puts "#{@name} has lost #{piece.print_piece}"
     @pieces_lost << piece
-    @pieces.delete(piece)
+    @pieces.delete(piece.number)
   end
 
   def get_piece_by_num(num)
@@ -59,7 +59,33 @@ class ComputerPlayer
     puts res
   end
 
-  def choice_error(choice)
-    "#{choice} is not a vaild choice"
+  def get_player_move(_, _)
+    piece_num = get_piece_selection
+    piece = get_piece_by_num(piece_num.to_i)
+
+    card_num = get_card_selection(piece)
+    card = get_card_by_num(card_num.to_i)
+
+    to_pos_num = get_move_selection(piece, card)
+    to_pos = piece.available_moves_as_hash(card)[to_pos_num.to_i]
+
+    [piece, card, to_pos]
+  end
+
+  def get_piece_selection
+    get_selection(available_pieces)
+  end
+
+  def get_card_selection(piece)
+    get_selection(available_cards_with_moves(piece))
+  end
+
+  def get_move_selection(piece, card)
+    get_selection(piece.available_moves_as_hash(card))
+  end
+
+  # input must be a hash.
+  def get_selection(options)
+    options.keys.sample
   end
 end

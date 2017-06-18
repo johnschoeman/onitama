@@ -34,7 +34,7 @@ class Card
     cards = []
     while cards.length < 5
       card = Card.new(@@card_dic.keys.sample)
-      cards.push(card) if cards.none? { |c| c.name == card.name}
+      cards.push(card) if cards.none? { |c| c.name == card.name }
     end
     cards
   end

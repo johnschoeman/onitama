@@ -1,5 +1,5 @@
 require 'rspec'
-require 'onitama_spec'
+require 'onitama'
 
 describe Board do
   let(:empty_board) { Board.new }
@@ -24,6 +24,6 @@ describe Board do
   end
 
   describe "#print_board" do
-    
+
   end
 end

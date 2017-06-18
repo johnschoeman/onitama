@@ -1,44 +1,48 @@
 class Piece
-  attr_reader :owner, :color, :number
+  attr_reader :color, :number
   attr_accessor :position
   #if @number == 0 the piece is a Sensei(King Piece)
   #if @number is 1,2,3 or 4 the piece is a pawn
-  def initialize(owner, number)
-    @owner = owner
-    @color = @owner.color
+  def initialize(color, number)
+    @color = color
     @number = number
   end
 
-  def self.initial_pieces(owner)
+  def self.initial_pieces(color)
     {
-      1 => Piece.new(owner, 1),
-      2 => Piece.new(owner, 2),
-      3 => Piece.new(owner, 3),
-      4 => Piece.new(owner, 4),
-      5 => Piece.new(owner, 5)
+      1 => Piece.new(color, 1),
+      2 => Piece.new(color, 2),
+      3 => Piece.new(color, 3),
+      4 => Piece.new(color, 4),
+      5 => Piece.new(color, 5)
     }
   end
 
   def print_piece
     if @color == "white"
       @number == 5 ? ">*<" : ">#{@number}<"
-    else
+    elsif @color == "black"
       @number == 5 ? "<*>" : "<#{@number}>"
     end
   end
 
   def print_name
-   @number == 5 ? "*" : @number.to_s
+    @number == 5 ? "*" : @number.to_s
   end
 
   # returns valid moves of piece at current position as array, selects only those that fall onto board.
   def available_moves_as_array(card)
     if @color == "white"
-      res = card.moves.map { |move| [@position[0] + move[0], @position[1] + move[1]] }
-      res.select { |move| (0..4).include?(move[0]) && (0..4).include?(move[1]) }
-    else
-      res = card.moves.map { |move| [@position[0] - move[0], @position[1] - move[1]] }
-      res.select { |move| (0..4).include?(move[0]) && (0..4).include?(move[1]) }
+      res = card.moves.map do |move|
+        [@position[0] + move[0], @position[1] + move[1]]
+      end
+    elsif @color == "black"
+      res = card.moves.map do |move|
+        [@position[0] - move[0], @position[1] - move[1]]
+      end
+    end
+    res.select do |move|
+      (0..4).include?(move[0]) && (0..4).include?(move[1])
     end
   end
 
@@ -46,14 +50,18 @@ class Piece
   def available_moves_as_hash(card)
     res = {}
     if @color == "white"
-      all_moves = card.moves.map { |move| [@position[0] + move[0], @position[1] + move[1]] }
-      moves_on_board = all_moves.select { |move| (0..4).include?(move[0]) && (0..4).include?(move[1]) }
-      moves_on_board.each_with_index { |move, i| res[i+1] = move}
-    else
-      all_moves = card.moves.map { |move| [@position[0] - move[0], @position[1] - move[1]] }
-      moves_on_board = all_moves.select { |move| (0..4).include?(move[0]) && (0..4).include?(move[1]) }
-      moves_on_board.each_with_index { |move, i| res[i+1] = move}
+      all_moves = card.moves.map do |move|
+        [@position[0] + move[0], @position[1] + move[1]]
+      end
+    elsif @color == "black"
+      all_moves = card.moves.map do |move|
+        [@position[0] - move[0], @position[1] - move[1]]
+      end
     end
+    moves_on_board = all_moves.select do |move|
+      (0..4).include?(move[0]) && (0..4).include?(move[1])
+    end
+    moves_on_board.each_with_index { |move, i| res[i + 1] = move }
     res
   end
 end
