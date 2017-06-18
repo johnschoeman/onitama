@@ -19,15 +19,24 @@ class Card
     cobra:    [[0, -1], [1, 1], [1, -1]]
   }
 
-  attr_reader :card_name, :moves
+  attr_reader :name, :moves
 
-  def initialize(card_name)
-    @card_name = card_name
-    @moves = @@card_dic[@card_name]
+  def initialize(name)
+    @name = name
+    @moves = @@card_dic[@name]
   end
 
   def print_card
-    @card_name.to_s
+    @name.to_s
+  end
+
+  def self.initial_cards
+    cards = []
+    while cards.length < 5
+      card = Card.new(@@card_dic.keys.sample)
+      cards.push(card) if cards.none? { |c| c.name == card.name}
+    end
+    cards
   end
 
 end

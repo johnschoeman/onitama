@@ -3,18 +3,27 @@ class Piece
   attr_accessor :position
   #if @number == 0 the piece is a Sensei(King Piece)
   #if @number is 1,2,3 or 4 the piece is a pawn
-  def initialize(owner = nil, number = 0)
+  def initialize(owner, number)
     @owner = owner
-    @color = @owner.color if @owner
+    @color = @owner.color
     @number = number
   end
 
+  def self.initial_pieces(owner)
+    {
+      1 => Piece.new(owner, 1),
+      2 => Piece.new(owner, 2),
+      3 => Piece.new(owner, 3),
+      4 => Piece.new(owner, 4),
+      5 => Piece.new(owner, 5)
+    }
+  end
+
   def print_piece
-    return "---" unless @owner
     if @color == "white"
-      return @number == 5 ? ">*<" : ">#{@number}<"
+      @number == 5 ? ">*<" : ">#{@number}<"
     else
-      return @number == 5 ? "<*>" : "<#{@number}>"
+      @number == 5 ? "<*>" : "<#{@number}>"
     end
   end
 
@@ -46,10 +55,5 @@ class Piece
       moves_on_board.each_with_index { |move, i| res[i+1] = move}
     end
     res
-  end
-
-
-  def choice_error
-    "Not a valid choice"
   end
 end

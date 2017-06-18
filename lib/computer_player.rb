@@ -5,13 +5,7 @@ class ComputerPlayer
   def initialize(name, color = 'black')
     @name = name
     @color = color
-    @pieces = {
-      1 => Piece.new(self, 1),
-      2 => Piece.new(self, 2),
-      3 => Piece.new(self, 3),
-      4 => Piece.new(self, 4),
-      5 => Piece.new(self, 5)
-    }
+    @pieces = Piece.initial_pieces(self)
     @pieces_lost = []
     @cards = {}
   end
@@ -61,7 +55,7 @@ class ComputerPlayer
 
   def print_cards
     res = "\t#{@name}'s Cards: \n"
-    @cards.each {|k, card| res += "\t{#{card.card_name}: #{card.moves}} \n"}
+    @cards.each {|k, card| res += "\t{#{card.name}: #{card.moves}} \n"}
     puts res
   end
 

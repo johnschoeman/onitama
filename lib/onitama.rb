@@ -1,3 +1,4 @@
+require 'byebug'
 # A ruby file that plays the boardgame Onitama, see README.
 require 'open-uri'
 require_relative 'board'
@@ -8,10 +9,6 @@ require_relative 'computer_player'
 
 
 class Onitama
-
-  @@card_list = [ :tiger, :dragon, :crab, :elephant, :monkey,
-                  :mantis, :crane, :boar, :frog, :rabbit,
-                  :goose, :rooster, :horse, :ox, :eel, :cobra]
 
   @@help_message = "\tType 'board' or 'b' to show the board
   \tType 'cards' or 'c' to show your available cards
@@ -24,46 +21,23 @@ class Onitama
   def initialize(players)
     @players = players
     @board = Board.new
-    @cards = []
     @current_player = 0
     setup_game
   end
 
   def setup_game
-    setup_pieces
+    @board.setup_pieces(@players)
     setup_cards
-  end
-
-  # Get pieces from players and place on board
-  def setup_pieces
-    @board.place_piece(@players[0].get_piece_by_num(5), [0, 2])
-    @board.place_piece(@players[1].get_piece_by_num(5), [4, 2])
-    (1..4).each do |n|
-      if n == 1 || n == 2
-        @board.place_piece(@players[0].get_piece_by_num(n), [0, n - 1])
-        @board.place_piece(@players[1].get_piece_by_num(n), [4, n - 1])
-      else
-        @board.place_piece(@players[0].get_piece_by_num(n), [0, n])
-        @board.place_piece(@players[1].get_piece_by_num(n), [4, n])
-      end
-    end
   end
 
   # Choose 5 cards at random and assign 2 to each player and 1 to the board.
   def setup_cards
-    while @cards.length < 5
-      card = random_card
-      @cards << card if @cards.none? { |c| c.card_name == card.card_name }
-    end
-    @players[0].cards[1] = @cards.shift
-    @players[0].cards[2] = @cards.shift
-    @players[1].cards[1] = @cards.shift
-    @players[1].cards[2] = @cards.shift
-    @board.card << @cards.shift
-  end
-
-  def random_card
-    Card.new(@@card_list[rand(0..15)])
+    cards = Card.initial_cards
+    @players[0].cards[1] = cards.shift
+    @players[0].cards[2] = cards.shift
+    @players[1].cards[1] = cards.shift
+    @players[1].cards[2] = cards.shift
+    @board.card << cards.shift
   end
 
   def play
@@ -83,7 +57,12 @@ class Onitama
       puts "#{@players[@current_player].name} it's your turn!"
       @board.print_board
       piece, card, to_pos = get_player_move
-      move_piece(piece, to_pos)
+      next unless move_is_valid?(to_pos)
+      if move_ends_game?(piece, to_pos)
+        move_piece(piece, to_pos)
+        declare_winner(@players[@current_player])
+      end
+      @board.move_piece(piece, to_pos)
       update_cards(card)
       switch_players
     end
@@ -114,76 +93,70 @@ class Onitama
 
   # input must be a hash.
   def get_selection(message, options)
-
-    while true
+    loop do
       puts "#{message}#{options}"
       user_input = gets.chomp.downcase
-
       if options.keys.include?(user_input.to_i)
         puts "you chose #{options[user_input.to_i]}"
         return user_input
       else
-
-        case user_input
-        when "back", "restart", "r"
-          #code to get to start of input
-        when "exit", "quit", "q"
-          quit_game
-        when "cards", "card", "c"
-          @players[@current_player].print_cards
-          @board.print_card
-          @players[(@current_player+1)%2].print_cards
-        when "board", "b"
-          @board.print_board
-        when "help", "h"
-          puts @@help_message
-        when "rules", "r"
-          link = "http://www.arcanewonders.com/resources/Onitama_Rulebook.PDF"
-          if RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/
-            system "start #{link}"
-          elsif RbConfig::CONFIG['host_os'] =~ /darwin/
-            system "open #{link}"
-          elsif RbConfig::CONFIG['host_os'] =~ /linux|bsd/
-            system "xdg-open #{link}"
-          end
-        else
-          puts input_error(user_input)
-        end
-
+        handle_non_move_choice(user_input)
       end
-
     end
-
   end
 
-  def move_piece(piece, to_pos)
-    check_to_pos(piece, to_pos)
-    @board.move_piece(piece, to_pos)
+  def handle_non_move_choice(user_input)
+    case user_input
+    when "back", "restart", "r"
+      #code to get to start of input
+    when "exit", "quit", "q"
+      quit_game
+    when "cards", "card", "c"
+      @players[@current_player].print_cards
+      @board.print_card
+      @players[(@current_player + 1) % 2].print_cards
+    when "board", "b"
+      @board.print_board
+    when "help", "h"
+      puts @@help_message
+    when "rules", "r"
+      link_to_rules
+    else
+      puts "#{user_input} is not a vaild input"
+    end
   end
 
-  def check_to_pos(piece, to_pos)
-    piece_at_pos = @board.board[to_pos[0]][to_pos[1]]
-    owner = piece_at_pos.owner
-    case owner
-      when @players[@current_player]
-        puts "You can't take your own piece."
-        play_turn
-      when @players[(@current_player+1)%2]
-        if piece_at_pos.number == 5
-          @board.move_piece(piece, to_pos)
-          declare_winner(@players[@current_player].name)
-        end
-        owner.remove_piece(piece_at_pos)
-      else
-        if to_pos == [0,2] && @players[@current_player].color == "black" && piece.number == 5
-          @board.move_piece(piece, to_pos)
-          declare_winner(@players[@current_player].name)
-        elsif to_pos == [4,5] && @players[@current_player].color == "white" && piece.number == 5
-          @board.move_piece(piece, to_pos)
-          delcare_winner(@players[@current_player].name)
-        end
-        return
+  def link_to_rules
+    link = "http://www.arcanewonders.com/resources/Onitama_Rulebook.PDF"
+    if RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/
+      system "start #{link}"
+    elsif RbConfig::CONFIG['host_os'] =~ /darwin/
+      system "open #{link}"
+    elsif RbConfig::CONFIG['host_os'] =~ /linux|bsd/
+      system "xdg-open #{link}"
     end
+  end
+
+  def move_is_valid?(to_pos)
+    piece_at_pos = @board[to_pos]
+    return true if piece_at_pos.nil?
+    if piece_at_pos.owner == @players[@current_player]
+      puts "You can't take your own piece."
+      return false
+    end
+    true
+  end
+
+  def move_ends_game?(piece, to_pos)
+    piece_at_pos = @board[to_pos]
+    return false if piece_at_pos.nil?
+    return true if piece_at_pos.number == 5
+    if to_pos == [0, 2] && @players[@current_player].color == "black" && piece.number == 5
+      return true
+    elsif to_pos == [4, 5] && @players[@current_player].color == "white" && piece.number == 5
+      return true
+    end
+    false
   end
 
   def update_cards(card)
@@ -200,26 +173,14 @@ class Onitama
 
   def declare_winner(player)
     puts "Game Over."
-    puts "#{player} has Won!"
-    exit
+    puts "#{player.name} has Won!"
+    @board.print_board
+    quit_game
   end
-
-  # def game_end
-  #   @board.print_board
-  #   if @board.winner
-  #     puts "Game Over! #{@board.winner} has won!"
-  #   else
-  #     puts "Exiting Game"
-  #   end
-  # end
 
   def quit_game
     puts "Exiting Game."
     exit
-  end
-
-  def input_error(input)
-    "#{input} is not a valid input"
   end
 end
 
