@@ -30,24 +30,8 @@ class Piece
     @number == 5 ? "*" : @number.to_s
   end
 
-  # returns valid moves of piece at current position as array, selects only those that fall onto board.
-  def available_moves_as_array(card)
-    if @color == "white"
-      res = card.moves.map do |move|
-        [@position[0] + move[0], @position[1] + move[1]]
-      end
-    elsif @color == "black"
-      res = card.moves.map do |move|
-        [@position[0] - move[0], @position[1] - move[1]]
-      end
-    end
-    res.select do |move|
-      (0..4).include?(move[0]) && (0..4).include?(move[1])
-    end
-  end
-
   # returns valid moves of piece at current position as hash, selects only those that fall onto board.
-  def available_moves_as_hash(card)
+  def available_moves(card)
     res = {}
     if @color == "white"
       all_moves = card.moves.map do |move|

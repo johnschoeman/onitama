@@ -39,4 +39,13 @@ class Card
     cards
   end
 
+  def self.setup_cards(players, board)
+    cards = self.initial_cards
+    players[0].cards[1] = cards.shift
+    players[0].cards[2] = cards.shift
+    players[1].cards[1] = cards.shift
+    players[1].cards[2] = cards.shift
+    board.card << cards.shift
+  end
+
 end

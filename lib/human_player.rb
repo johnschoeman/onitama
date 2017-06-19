@@ -31,17 +31,6 @@ class HumanPlayer
     @cards[num]
   end
 
-  def get_piece_by_name(name)
-    case name
-    when "1", "2", "3", "4"
-      return @pieces[name.to_i]
-    when "s", "S"
-      return @pieces[0]
-    else
-      choice_error(name)
-    end
-  end
-
   def available_pieces
     res = {}
     @pieces.each { |k, piece| res[k] = piece.print_piece }
@@ -56,7 +45,9 @@ class HumanPlayer
 
   def available_cards_with_moves(piece)
     res = {}
-    @cards.each { |k, card| res[k] = card.print_card + ": #{piece.available_moves_as_array(card)}"}
+    @cards.each do |k, card|
+      res[k] = card.print_card + ": #{piece.available_moves(card).values}"
+    end
     res
   end
 
@@ -74,7 +65,7 @@ class HumanPlayer
     card = get_card_by_num(card_num.to_i)
 
     to_pos_num = get_move_selection(piece, card, board, opponent)
-    to_pos = piece.available_moves_as_hash(card)[to_pos_num.to_i]
+    to_pos = piece.available_moves(card)[to_pos_num.to_i]
 
     [piece, card, to_pos]
   end
@@ -88,7 +79,7 @@ class HumanPlayer
   end
 
   def get_move_selection(piece, card, board = nil, opponent = nil)
-    get_selection("Choose move: ", piece.available_moves_as_hash(card), board, opponent)
+    get_selection("Choose move: ", piece.available_moves(card), board, opponent)
   end
 
   # input must be a hash.

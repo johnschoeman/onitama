@@ -16,28 +16,18 @@ class Onitama
     @players = players
     @board = Board.new
     @current_player = 0
-    setup_game
-  end
 
-  def setup_game
-    byebug
-    @board.setup_pieces(@players)
-    setup_cards
-  end
-
-  # Choose 5 cards at random and assign 2 to each player and 1 to the board.
-  def setup_cards
-    cards = Card.initial_cards
-    @players[0].cards[1] = cards.shift
-    @players[0].cards[2] = cards.shift
-    @players[1].cards[1] = cards.shift
-    @players[1].cards[2] = cards.shift
-    @board.card << cards.shift
   end
 
   def play
+    setup_game
     game_start
     play_turn
+  end
+
+  def setup_game
+    @board.setup_pieces(@players)
+    Card.setup_cards(@players, @board)
   end
 
   def game_start
@@ -53,21 +43,26 @@ class Onitama
       @board.print_board
       piece, card, to_pos = @players[@current_player].get_player_move(@board, @players[(@current_player + 1) % 2])
       next unless move_is_valid?(piece, to_pos)
-      if move_ends_game?(piece, to_pos)
-        @board.move_piece(piece, to_pos)
-        declare_winner(@players[@current_player])
-      end
-      if move_takes_piece?(piece, to_pos)
-        piece_at_pos = @board[to_pos]
-        @players[(@current_player + 1) % 2].remove_piece(piece_at_pos)
-      end
-      @board.move_piece(piece, to_pos)
+      handle_move(piece, to_pos)
       update_cards(card)
       switch_players
     end
   end
 
+  def handle_move(piece, to_pos)
+    if move_ends_game?(piece, to_pos)
+      @board.move_piece(piece, to_pos)
+      declare_winner(@players[@current_player])
+    end
+    if move_takes_piece?(to_pos)
+      piece_at_pos = @board[to_pos]
+      @players[(@current_player + 1) % 2].remove_piece(piece_at_pos)
+    end
+    @board.move_piece(piece, to_pos)
+  end
+
   def move_is_valid?(piece, to_pos)
+    return false if piece.nil? || to_pos.nil?
     piece_at_pos = @board[to_pos]
     return true if piece_at_pos.nil?
     if piece_at_pos.color == piece.color
@@ -79,17 +74,16 @@ class Onitama
 
   def move_ends_game?(piece, to_pos)
     piece_at_pos = @board[to_pos]
-    return false if piece_at_pos.nil?
-    return true if piece_at_pos.number == 5
-    if to_pos == [0, 2] && @players[@current_player].color == "black" && piece.number == 5
+    return true if !piece_at_pos.nil? && piece_at_pos.number == 5
+    if to_pos == [0, 2] && piece.color == "black" && piece.number == 5
       return true
-    elsif to_pos == [4, 5] && @players[@current_player].color == "white" && piece.number == 5
+    elsif to_pos == [4, 2] && piece.color == "white" && piece.number == 5
       return true
     end
     false
   end
 
-  def move_takes_piece?(piece, to_pos)
+  def move_takes_piece?(to_pos)
     return false if @board[to_pos].nil?
     true
   end
@@ -121,7 +115,8 @@ end
 
 if __FILE__ == $PROGRAM_NAME
   human1 = HumanPlayer.new("Fin the Human", "white")
-  computer1 = ComputerPlayer.new("Cicel the Robot", "black")
-  game = Onitama.new([human1, computer1])
+  computer1 = ComputerPlayer.new("Rudi the Robot", "black")
+  computer2 = ComputerPlayer.new("Margo the Martian", "white")
+  game = Onitama.new([computer2, computer1])
   game.play
 end
