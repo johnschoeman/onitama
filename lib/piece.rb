@@ -1,11 +1,13 @@
 class Piece
-  attr_reader :color, :number
+  attr_reader :color, :number, :value
   attr_accessor :position
   #if @number == 0 the piece is a Sensei(King Piece)
   #if @number is 1,2,3 or 4 the piece is a pawn
-  def initialize(color, number)
+  def initialize(color, number, value = 1.0)
     @color = color
     @number = number
+    @value = value
+    @position = nil
   end
 
   def self.initial_pieces(color)
@@ -30,22 +32,21 @@ class Piece
     @number == 5 ? "*" : @number.to_s
   end
 
-  # returns valid moves of piece at current position as hash, selects only those that fall onto board.
   def available_moves(card)
     res = {}
-    if @color == "white"
-      all_moves = card.moves.map do |move|
-        [@position[0] + move[0], @position[1] + move[1]]
-      end
-    elsif @color == "black"
-      all_moves = card.moves.map do |move|
-        [@position[0] - move[0], @position[1] - move[1]]
-      end
-    end
+    all_moves = card.moves.map { |move| self.to_pos(move) }
     moves_on_board = all_moves.select do |move|
       (0..4).include?(move[0]) && (0..4).include?(move[1])
     end
     moves_on_board.each_with_index { |move, i| res[i + 1] = move }
     res
+  end
+
+  def to_pos(move)
+    if @color == "white"
+      [@position[0] + move[0], @position[1] + move[1]]
+    elsif @color == "black"
+      [@position[0] - move[0], @position[1] - move[1]]
+    end
   end
 end

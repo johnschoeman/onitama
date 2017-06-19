@@ -8,9 +8,7 @@ describe Onitama do
   let(:game) { Onitama.new([player1, player2]) }
 
   let(:white_sensei) { Piece.new("white", 5) }
-
   let(:black_sensei) { Piece.new("black", 5) }
-
 
   let(:white_student1) { Piece.new("white", 1) }
   let(:white_student2) { Piece.new("white", 2) }

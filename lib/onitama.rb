@@ -16,7 +16,6 @@ class Onitama
     @players = players
     @board = Board.new
     @current_player = 0
-
   end
 
   def play
@@ -31,10 +30,8 @@ class Onitama
   end
 
   def game_start
-    puts "--Welcome to Onitama!--"
-    puts ""
-    puts HumanPlayer.class_variable_get(:@@help_message)
-    puts ""
+    puts "\t--Welcome to Onitama!--\n\n"
+    puts HumanPlayer.class_variable_get(:@@help_message) + "\n\n"
   end
 
   def play_turn
@@ -117,6 +114,7 @@ if __FILE__ == $PROGRAM_NAME
   human1 = HumanPlayer.new("Fin the Human", "white")
   computer1 = ComputerPlayer.new("Rudi the Robot", "black")
   computer2 = ComputerPlayer.new("Margo the Martian", "white")
-  game = Onitama.new([computer2, computer1])
+  game = Onitama.new([human1, computer1])
+  #game = Onitama.new([computer2, computer1])
   game.play
 end
