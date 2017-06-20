@@ -45,7 +45,12 @@ class Card
     players[0].cards[2] = cards.shift
     players[1].cards[1] = cards.shift
     players[1].cards[2] = cards.shift
+    board.card = []
     board.card << cards.shift
+  end
+
+  def copy
+    Card.new(@name)
   end
 
 end

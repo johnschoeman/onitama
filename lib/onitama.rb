@@ -115,6 +115,6 @@ if __FILE__ == $PROGRAM_NAME
   computer1 = ComputerPlayer.new("Rudi the Robot", "black")
   computer2 = ComputerPlayer.new("Margo the Martian", "white")
   game = Onitama.new([human1, computer1])
-  #game = Onitama.new([computer2, computer1])
+  game = Onitama.new([computer2, computer1])
   game.play
 end

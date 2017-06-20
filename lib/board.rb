@@ -1,10 +1,9 @@
 class Board
-  attr_reader :grid
-  attr_accessor :card
+  attr_accessor :grid, :card
 
   def initialize
     @grid = Array.new(5) { Array.new(5) { nil } }
-    @card = []
+    @card = [nil]
   end
 
   def [](pos)
@@ -18,6 +17,7 @@ class Board
   end
 
   def setup_pieces(players)
+    @grid = Array.new(5) { Array.new(5) { nil } }
     place_piece(players[0].get_piece_by_num(5), [0, 2])
     place_piece(players[1].get_piece_by_num(5), [4, 2])
     (1..4).each do |n|
@@ -70,6 +70,19 @@ class Board
   def move_piece(piece, to_pos)
     remove_piece(piece.position)
     place_piece(piece, to_pos)
+  end
+
+
+  def copy
+    new_board = Board.new
+    self.grid.each_index do |row|
+      self.grid.each_index do |col|
+        next if self[[row, col]].nil?
+        new_piece = self[[row, col]].dup
+        new_board.place_piece(new_piece, [row, col])
+      end
+    end
+    new_board
   end
 
 end
