@@ -49,10 +49,4 @@ class Piece
       [@position[0] - move[0], @position[1] - move[1]]
     end
   end
-
-  def copy
-    piece_copy = Piece.new(@color, @number, @value)
-    piece_copy.position = @position
-    piece_copy
-  end
 end
