@@ -6,13 +6,13 @@ class HumanPlayer
   \tType 'help' or 'h' for help
   \tType 'rules' or 'r' for rules"
 
-  attr_reader :name, :color
+  attr_reader :name, :side
   attr_accessor :pieces, :pieces_lost, :cards
 
-  def initialize(name, color = 'white')
+  def initialize(name, side = 'top')
     @name = name
-    @color = color
-    @pieces = Piece.initial_pieces(color)
+    @side = side
+    @pieces = Piece.initial_pieces(side)
     @pieces_lost = []
     @cards = {}
   end

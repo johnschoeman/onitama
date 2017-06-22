@@ -19,13 +19,13 @@ class ComputerPlayer
                             [0.6, 0.9, 1.1, 0.9, 0.6],
                             [0.5, 0.8, 1.0, 0.8, 0.5]]
 
-  attr_reader :name, :color
+  attr_reader :name, :side
   attr_accessor :pieces, :pieces_lost, :cards
 
-  def initialize(name, color = 'black')
+  def initialize(name, side = 'bot')
     @name = name
-    @color = color
-    @pieces = Piece.initial_pieces(color)
+    @side = side
+    @pieces = Piece.initial_pieces(side)
     @pieces_lost = []
     @cards = {}
   end
@@ -60,7 +60,7 @@ class ComputerPlayer
       @cards.each do |_k, card|
         moves = piece.available_moves(card)
         moves.each do |_k, move|
-          next if !board[move].nil? && board[move].color == @color
+          next if !board[move].nil? && board[move].side == @side
           board_value = board_value_after_move(board, piece, move)
           moves_by_value << [[piece, card, move], board_value]
         end
@@ -100,16 +100,16 @@ class ComputerPlayer
     if piece.number != 5
       return @@pos_values_student
     end
-    if piece.color == "white"
+    if piece.side == "top"
       return @@pos_values_top_senei
-    elsif piece.color == "black"
+    elsif piece.side == "bot"
       return @@pos_values_bot_senei
     end
   end
 
   def scale_factor_to_use(piece)
-    scale_factor = piece.color != @color ? -2 : 1
-    scale_factor *= 10 if piece.color != @color && piece.number == 5
+    scale_factor = piece.side != @side ? -2 : 1
+    scale_factor *= 10 if piece.side != @side && piece.number == 5
     scale_factor
   end
 

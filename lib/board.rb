@@ -16,17 +16,17 @@ class Board
     @grid[row][col] = piece
   end
 
-  def setup_pieces(players)
+  def setup_pieces(top_player, bot_player)
     @grid = Array.new(5) { Array.new(5) { nil } }
-    place_piece(players[0].get_piece_by_num(5), [0, 2])
-    place_piece(players[1].get_piece_by_num(5), [4, 2])
+    place_piece(top_player.get_piece_by_num(5), [0, 2])
+    place_piece(bot_player.get_piece_by_num(5), [4, 2])
     (1..4).each do |n|
       if n == 1 || n == 2
-        place_piece(players[0].get_piece_by_num(n), [0, n - 1])
-        place_piece(players[1].get_piece_by_num(n), [4, n - 1])
+        place_piece(top_player.get_piece_by_num(n), [0, n - 1])
+        place_piece(bot_player.get_piece_by_num(n), [4, n - 1])
       else
-        place_piece(players[0].get_piece_by_num(n), [0, n])
-        place_piece(players[1].get_piece_by_num(n), [4, n])
+        place_piece(top_player.get_piece_by_num(n), [0, n])
+        place_piece(bot_player.get_piece_by_num(n), [4, n])
       end
     end
   end

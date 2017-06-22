@@ -11,8 +11,8 @@ Save the files and run 'ruby play_onitama.rb' to play.
 
 # Conventions:
 
-* player1 color is white and is at top of board.
-* player2 color is black and is at bottom of board.
+* player1 side is top and is at top of board.
+* player2 side is bot and is at bottom of board.
 
 # Game Rules:
 
