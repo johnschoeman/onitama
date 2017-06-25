@@ -6,15 +6,17 @@ class HumanPlayer
   \tType 'help' or 'h' for help
   \tType 'rules' or 'r' for rules"
 
-  attr_reader :name, :side
-  attr_accessor :pieces, :pieces_lost, :cards
+  attr_reader :name
+  attr_accessor :pieces, :pieces_lost, :cards, :side
 
-  def initialize(name, side = 'top')
+  def initialize(name)
     @name = name
-    @side = side
-    @pieces = Piece.initial_pieces(side)
     @pieces_lost = []
     @cards = {}
+  end
+
+  def assign_pieces
+    @pieces = Piece.initial_pieces(@side)
   end
 
   def remove_piece(piece)
@@ -99,7 +101,7 @@ class HumanPlayer
   def handle_non_move_choice(user_input, board, opponent)
 
     case user_input
-    when "back", "restart", "r"
+    when "back", "restart"
       #code to get to start of input
     when "exit", "quit", "q"
       quit_game

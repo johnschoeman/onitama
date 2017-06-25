@@ -13,8 +13,11 @@ class Onitama
   attr_reader :board, :players, :cards
 
   def initialize(top_player, bot_player)
+    byebug
     @top_player = top_player
+    top_player.side = "top"
     @bot_player = bot_player
+    bot_player.side = "bot"
     @board = Board.new
     @current_player = top_player
     @other_player = bot_player
@@ -27,6 +30,8 @@ class Onitama
   end
 
   def setup_game
+    @top_player.assign_pieces
+    @bot_player.assign_pieces
     @board.setup_pieces(@top_player, @bot_player)
     Card.setup_cards(@top_player, @bot_player, @board)
   end
@@ -119,10 +124,10 @@ class Onitama
 end
 
 if __FILE__ == $PROGRAM_NAME
-  human1 = HumanPlayer.new("Fin the Human", "top")
-  computer1 = ComputerPlayer.new("Rudi the Robot", "bot")
-  computer2 = ComputerPlayer.new("Margo the Martian", "top")
+  human1 = HumanPlayer.new("Fin the Human")
+  computer1 = ComputerPlayer.new("Rudi the Robot")
+  computer2 = ComputerPlayer.new("Margo the Martian")
   game = Onitama.new(human1, computer1)
-  game = Onitama.new(computer2, computer1)
+  #game = Onitama.new(computer2, computer1)
   game.play
 end
